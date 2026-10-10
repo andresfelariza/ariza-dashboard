@@ -1,0 +1,17 @@
+# Never commit plaintext dashboard or local secrets
+index.source.html
+*.plain.html
+ACCESS.txt
+PUBLIC_URL.txt
+DASHBOARD_PASSWORD
+.env
+.env.*
+*.log
+server.pid
+tunnel.pid
+edge_forwarder.pid
+watchdog.pid
+www/
+pages-build/
+node_modules/
+.staticrypt.local.json
