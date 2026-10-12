@@ -1,14 +1,14 @@
 /**
  * DashboardPlugins.trash — trash / recycling pickup reminder (Tigard-style Tue morning).
  * Trash every week; recycling every other week.
- * Anchor: week of Mon 2026-10-13 = trash only; Mon 2026-10-20 = trash + recycling.
+ * Anchor: week of Mon 2026-10-12 = trash only; Mon 2026-10-19 = trash + recycling.
  */
 (function (global) {
   "use strict";
 
   const TZ = "America/Los_Angeles";
   // First trash-only Monday (take bins out Mon night for Tue pickup)
-  const ANCHOR_MONDAY = "2026-10-13";
+  const ANCHOR_MONDAY = "2026-10-12";
 
   function tzParts(d) {
     const fmt = new Intl.DateTimeFormat("en-US", {
@@ -151,7 +151,7 @@
         "<strong>" +
         info.line.replace(/^Tonight: |^Next pickup Tue: /, "") +
         "</strong></p>" +
-        "<p class=\"notes-when\">Anchor: week of Oct 12–13, 2026 = trash only; Oct 19–20 = trash + recycling; then alternating.</p></div>";
+        "<p class=\"notes-when\">Anchor: Mon Oct 12 night = trash only (Tue Oct 13 pickup); Mon Oct 19 night = trash + recycling (Tue Oct 20 pickup); then alternating.</p></div>";
       global.openModal("Trash & recycling", "Tigard / kitchen reminder", html);
     },
 

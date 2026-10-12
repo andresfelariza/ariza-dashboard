@@ -115,13 +115,21 @@
     },
 
     _loadFirebaseSdk: function () {
-      return new Promise((resolve, reject) => {
-        if (global.firebase && global.firebase.firestore) {
-          resolve();
-          return;
-        }
+      if (global.firebase && global.firebase.firestore) return Promise.resolve();
+      if (global.__firebaseSdkReady) return global.__firebaseSdkReady;
+      global.__firebaseSdkReady = new Promise((resolve, reject) => {
         const add = (src) =>
           new Promise((res, rej) => {
+            if (document.querySelector('script[src="' + src + '"]')) {
+              // wait briefly for prior loader
+              const t0 = Date.now();
+              const wait = () => {
+                if (global.firebase && global.firebase.firestore) return res();
+                if (Date.now() - t0 > 8000) return rej(new Error("timeout " + src));
+                setTimeout(wait, 50);
+              };
+              return wait();
+            }
             const s = document.createElement("script");
             s.src = src;
             s.async = true;
@@ -135,6 +143,7 @@
           .then(resolve)
           .catch(reject);
       });
+      return global.__firebaseSdkReady;
     },
 
     init: async function () {
