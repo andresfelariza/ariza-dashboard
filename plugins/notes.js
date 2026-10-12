@@ -186,7 +186,7 @@
           if (!data.ciphertext) return;
           try {
             const remote = await this.decryptState(data.ciphertext);
-            if (!this.state || (remote.rev || 0) >= (this.state.rev || 0)) {
+            if (!this.state || (remote.rev || 0) > (this.state.rev || 0)) {
               this.state = remote;
               if (!this.state.notes) this.state.notes = [];
               this.saveLocal();
@@ -209,8 +209,6 @@
     _pushRemote: async function () {
       if (this.mode !== "firebase" || !this.listRef || !this.key) return;
       try {
-        this.state.rev = (this.state.rev || 0) + 1;
-        this.state.updatedAt = Date.now();
         const ciphertext = await this.encryptState(this.state);
         await this.listRef.set(
           {
@@ -229,6 +227,9 @@
     },
 
     _schedulePush: function () {
+      // Bump rev immediately so an in-flight snapshot with the old rev cannot clobber local edits
+      this.state.rev = (this.state.rev || 0) + 1;
+      this.state.updatedAt = Date.now();
       this.saveLocal();
       this.renderPreview();
       if (this.mode !== "firebase") return;

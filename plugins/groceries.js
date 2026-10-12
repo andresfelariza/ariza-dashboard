@@ -242,7 +242,7 @@
           try {
             const remote = await this.decryptState(data.ciphertext);
             // Merge by rev / updatedAt
-            if (!this.state || (remote.rev || 0) >= (this.state.rev || 0)) {
+            if (!this.state || (remote.rev || 0) > (this.state.rev || 0)) {
               this.state = remote;
               this.saveLocal();
               this._emit();
