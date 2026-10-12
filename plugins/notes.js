@@ -178,6 +178,7 @@
       this.mode = "firebase";
       this.unsub = this.listRef.onSnapshot(
         async (snap) => {
+          if (this._pendingLocal) return; // local edit in flight — don't clobber
           if (!snap.exists) {
             await this._pushRemote();
             return;
@@ -219,20 +220,26 @@
           },
           { merge: true }
         );
+        this._pendingLocal = false;
         this.saveLocal();
       } catch (e) {
         console.warn("[notes] push failed", e);
+        this._pendingLocal = false;
         this.saveLocal();
       }
     },
 
     _schedulePush: function () {
       // Bump rev immediately so an in-flight snapshot with the old rev cannot clobber local edits
+      this._pendingLocal = true;
       this.state.rev = (this.state.rev || 0) + 1;
       this.state.updatedAt = Date.now();
       this.saveLocal();
       this.renderPreview();
-      if (this.mode !== "firebase") return;
+      if (this.mode !== "firebase") {
+        this._pendingLocal = false;
+        return;
+      }
       clearTimeout(this._writeTimer);
       this._writeTimer = setTimeout(() => this._pushRemote(), 250);
     },
